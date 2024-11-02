@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../constants/color_constants.dart';
+import 'recording_screen.dart'; // Import the RecordingScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,9 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
                 color: Colors.blue,
@@ -53,31 +51,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         child: IconButton(
                           onPressed: () {},
                           icon: Image(
                             image: AssetImage('assets/microphone.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
+                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         "Upload",
                         style: GoogleFonts.robotoCondensed(
@@ -96,31 +84,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         child: IconButton(
                           onPressed: () {},
                           icon: Image(
                             image: AssetImage('assets/upload.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
+                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         "Practice",
                         style: GoogleFonts.robotoCondensed(
@@ -139,31 +117,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RecordingScreen(),
+                              ),
+                            );
+                          },
                           icon: Image(
                             image: AssetImage('assets/chat.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
+                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         "Record",
                         style: GoogleFonts.robotoCondensed(
@@ -176,9 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             Divider(color: Colors.grey.shade800),
             SizedBox(
               width: MediaQuery.of(context).size.width - 40,
@@ -194,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 125,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                        padding: WidgetStatePropertyAll(EdgeInsets.all(8)),
+                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                        padding: MaterialStateProperty.all(EdgeInsets.all(8)),
                       ),
                       onPressed: () {},
                       child: Row(
@@ -217,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
                 color: Colors.blue,
@@ -231,9 +204,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Text("Text that is coming from the audio why didn't it work this computer is broken",
+                      child: Text(
+                        "Text that is coming from the audio why didn't it work this computer is broken",
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -241,19 +216,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(12.0),
                       child: Text("Created on December 24, 2024"),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-// Strings => "This is a string"
-// Bool or Booleans => true or false
-// Integers => whole numbers
-// Doubles => decimal number but big (takes a lot of number)
-// Floats => decimal number but small (takes less numbers)
