@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +15,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<void> soundOpener() async {
+    FilePickerResult? pdf = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3', 'mp4'],
+    );
+
+    if (pdf != null) {
+      File file = File(pdf.files.single.path!);
+      print('PDF picked: ${file.path}');
+    } else {
+      print('User canceled the picker');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: IconButton(
                           onPressed: () {},
                           icon: Image(
-                            image: AssetImage('assets/microphone.png'),
+                            image: AssetImage('assets/upload.png'),
                             height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                             width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
@@ -90,9 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
                             : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: ()async{
+                            await soundOpener();
+                          },
                           icon: Image(
-                            image: AssetImage('assets/upload.png'),
+                            image: AssetImage('assets/chat.png'),
                             height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                             width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
@@ -132,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           icon: Image(
-                            image: AssetImage('assets/chat.png'),
+                            image: AssetImage('assets/microphone.png'),
                             height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                             width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
