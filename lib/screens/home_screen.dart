@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:official_communiclear/screens/practice_screen.dart';
 import '../constants/color_constants.dart';
 import 'recording_screen.dart'; // Import the RecordingScreen
 
@@ -74,9 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
                             : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PracticeScreen()));
+                          },
                           icon: Image(
-                            image: AssetImage('assets/upload.png'),
+                            image: AssetImage('assets/chat.png'),
                             height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                             width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
@@ -84,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Upload",
+                        "Practice",
                         style: GoogleFonts.robotoCondensed(
                           color: Colors.white,
                           fontSize: 18,
@@ -111,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             await soundOpener();
                           },
                           icon: Image(
-                            image: AssetImage('assets/chat.png'),
+                            image: AssetImage('assets/upload.png'),
                             height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                             width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
                           ),
@@ -119,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Practice",
+                        "upload",
                         style: GoogleFonts.robotoCondensed(
                           color: Colors.white,
                           fontSize: 18,
@@ -188,6 +191,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(Colors.blue),
                         padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          )
+                        )
                       ),
                       onPressed: () {},
                       child: Row(
