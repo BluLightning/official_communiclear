@@ -30,8 +30,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        "model": "gpt-3.5-turbo", // or use your preferred OpenAI model
+        "model": "gpt-3.5-turbo", // or your preferred model
         "messages": [
+          {"role": "system", "content": "Take on the role of a dialect coach to help me practice my conversation skills."},
+          ..._messages.map((msg) => {"role": msg['sender'] == "user" ? "user" : "assistant", "content": msg['message']}),
           {"role": "user", "content": message}
         ]
       }),
@@ -52,6 +54,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
