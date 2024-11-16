@@ -67,9 +67,19 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
   }
 
   Future<void> _prepareNewRecordingPath() async {
-    Directory tempDir = await getTemporaryDirectory();
-    _filePath = '${tempDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+    // Use the Downloads directory to save recordings
+    Directory downloadsDir = Directory('/storage/emulated/0/Download');
+
+    // Ensure the directory exists
+    if (!downloadsDir.existsSync()) {
+      downloadsDir.createSync(recursive: true);
+    }
+
+    // Define the file path for the recording
+    _filePath = '${downloadsDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+    print("Recording path set to: $_filePath");
   }
+
 
   Future<void> _startRecording() async {
     if (_recorder != null && !_isRecording) {
@@ -123,11 +133,16 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
   }
 
   Future<void> _loadRecordings() async {
-    Directory tempDir = await getTemporaryDirectory();
+    Directory downloadsDir = Directory('/storage/emulated/0/Download');
+
+    // List all .wav files in the Downloads directory
     setState(() {
-      _recordings = tempDir.listSync().where((file) => file.path.endsWith('.wav')).toList();
+      _recordings = downloadsDir.listSync().where((file) => file.path.endsWith('.wav')).toList();
     });
+
+    print("Recordings loaded: ${_recordings.map((e) => e.path).toList()}");
   }
+
 
   Future<void> _renameRecording(FileSystemEntity recording) async {
     String oldPath = recording.path;

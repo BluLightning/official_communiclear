@@ -7,6 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:official_communiclear/screens/practice_screen.dart';
 import '../constants/color_constants.dart';
 import 'recording_screen.dart'; // Import the RecordingScreen
+import 'package:path_provider/path_provider.dart';
+import 'fileviewer_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,18 +20,53 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> soundOpener() async {
-    FilePickerResult? pdf = await FilePicker.platform.pickFiles(
+    // Get the app's private directory where recordings are saved
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    // List all recorded audio files in the private directory
+    List<FileSystemEntity> recordings = appDocDir.listSync().where((file) => file.path.endsWith('.wav')).toList();
+
+    // Log all available recordings
+    if (recordings.isNotEmpty) {
+      print("Recordings available in the app's directory:");
+      for (var recording in recordings) {
+        print("Recording: ${recording.path}");
+      }
+    } else {
+      print("No recordings found in the app's directory.");
+    }
+
+    // Allow the user to pick a file from public storage
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['mp3', 'mp4'],
+      allowedExtensions: ['mp3', 'mp4', 'wav', 'txt'], // Allow specific file types
     );
 
-    if (pdf != null) {
-      File file = File(pdf.files.single.path!);
-      print('PDF picked: ${file.path}');
+    if (result != null) {
+      File pickedFile = File(result.files.single.path!);
+      print("Picked file: ${pickedFile.path}");
+
+      // Navigate to the FileViewerScreen with the picked file path
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FileViewerScreen(filePath: pickedFile.path),
+        ),
+      );
     } else {
-      print('User canceled the picker');
+      print("User canceled the picker.");
     }
   }
+
+
+// Example function to play audio
+  void _playAudio(File audioFile) {
+    // Implement audio player logic here
+    print("Playing audio file: ${audioFile.path}");
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {

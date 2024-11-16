@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class PracticeScreen extends StatefulWidget {
   const PracticeScreen({super.key});
@@ -55,6 +59,51 @@ class _PracticeScreenState extends State<PracticeScreen> {
     }
   }
 
+  Future<void> _saveConversation() async {
+    try {
+      // Convert messages to a single string
+      String conversation = _messages.map((msg) {
+        final sender = msg['sender'] == 'user' ? 'You' : 'AI';
+        return "$sender: ${msg['message']}";
+      }).join("\n");
+
+      // Get the public external storage directory
+      final directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      // Define the file path
+      final filePath = '${directory.path}/conversation_${DateTime.now().millisecondsSinceEpoch}.txt';
+
+      // Save the conversation to the file
+      final file = File(filePath);
+      await file.writeAsString(conversation);
+
+      // Provide feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Conversation saved to $filePath')),
+      );
+
+      print('Conversation saved: $filePath');
+    } catch (e) {
+      // Handle errors
+      print('Error saving conversation: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save conversation')),
+      );
+    }
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    final status = await Permission.storage.request();
+    return status.isGranted;
+  }
+
+  Future<List<FileSystemEntity>> _listSavedConversations() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.listSync().where((file) => file.path.endsWith('.txt')).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +170,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 ),
               ],
             ),
+          ),
+          ElevatedButton(
+            onPressed: _saveConversation,
+            child: Text("Save Conversation"),
           ),
         ],
       ),
