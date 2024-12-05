@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: ColorConst.containerColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               width: MediaQuery.of(context).size.width - 40,
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         "Practice",
                         style: GoogleFonts.robotoCondensed(
-                          color: Colors.white,
+                          color: ColorConst.primaryColor,
                           fontSize: 18,
                         ),
                       )
@@ -160,9 +160,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "upload",
+                        "Upload",
                         style: GoogleFonts.robotoCondensed(
-                          color: Colors.white,
+                          color: ColorConst.primaryColor,
                           fontSize: 18,
                         ),
                       )
@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         "Record",
                         style: GoogleFonts.robotoCondensed(
-                          color: Colors.white,
+                          color: ColorConst.primaryColor,
                           fontSize: 18,
                         ),
                       )
@@ -221,13 +221,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     "Recent",
                     style: GoogleFonts.robotoCondensed(
-                        color: Colors.white, fontSize: 20),
+                        color: ColorConst.primaryColor, fontSize: 20),
                   ),
                   SizedBox(
                     width: 125,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                        backgroundColor: MaterialStateProperty.all(ColorConst.containerColor),
                         padding: MaterialStateProperty.all(EdgeInsets.all(8)),
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             "History",
                             style: GoogleFonts.robotoCondensed(
-                                color: Colors.white, fontSize: 20),
+                                color: ColorConst.primaryColor, fontSize: 20),
                           ),
                           Icon(
                             CupertinoIcons.arrow_right_circle,
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: ColorConst.containerColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               width: MediaQuery.of(context).size.width - 40,
@@ -273,13 +273,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         "Text that is coming from the audio why didn't it work this computer is broken",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.robotoCondensed(color: ColorConst.primaryColor),
                       ),
                     ),
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Text("Created on December 24, 2024"),
+                      child: Text("Created on December 24, 2024",style: GoogleFonts.robotoCondensed(color: ColorConst.primaryColor),),
                     ),
                   ),
                 ],

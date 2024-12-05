@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:official_communiclear/constants/color_constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -108,9 +110,14 @@ class _PracticeScreenState extends State<PracticeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConst.backgroundColor,
       appBar: AppBar(
-        title: Text("Chat with AI"),
+        title: Text("Chat with AI", style: GoogleFonts.robotoCondensed(
+          color: ColorConst.backgroundColor,
+          fontSize: 30,
+        ),),
         backgroundColor: Colors.blue,
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -127,7 +134,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isUser ? Colors.blue : Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: isUser
+                          ? BorderRadius.only(topLeft: Radius.circular(10), bottomLeft:Radius.circular(10), topRight: Radius.circular(10),)
+                          :BorderRadius.only(topLeft: Radius.circular(10), bottomRight:Radius.circular(10), topRight: Radius.circular(10),),
                     ),
                     child: Text(
                       message['message']!,
