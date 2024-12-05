@@ -10,7 +10,6 @@ import 'recording_screen.dart'; // Import the RecordingScreen
 import 'package:path_provider/path_provider.dart';
 import 'fileviewer_screen.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -24,7 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Directory appDocDir = await getApplicationDocumentsDirectory();
 
     // List all recorded audio files in the private directory
-    List<FileSystemEntity> recordings = appDocDir.listSync().where((file) => file.path.endsWith('.wav')).toList();
+    List<FileSystemEntity> recordings = appDocDir
+        .listSync()
+        .where((file) => file.path.endsWith('.wav'))
+        .toList();
 
     // Log all available recordings
     if (recordings.isNotEmpty) {
@@ -39,7 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
     // Allow the user to pick a file from public storage
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['mp3', 'mp4', 'wav', 'txt'], // Allow specific file types
+      allowedExtensions: [
+        'mp3',
+        'mp4',
+        'wav',
+        'txt'
+      ], // Allow specific file types
     );
 
     if (result != null) {
@@ -58,15 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
 // Example function to play audio
   void _playAudio(File audioFile) {
     // Implement audio player logic here
     print("Playing audio file: ${audioFile.path}");
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -107,19 +110,89 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         child: IconButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PracticeScreen()));
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Container(
+                                  height:
+                                      MediaQuery.of(context).size.height / 2,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(25),
+                                          topLeft: Radius.circular(25)),
+                                      color: ColorConst.backgroundColor),
+                                  child: Center(
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Text(
+                                          "Choose Conversation Topic",
+                                          style: TextStyle(
+                                              color: ColorConst.primaryColor),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PracticeScreen()));
+                                            },
+                                            child: Text('Topic1'),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        SizedBox(
+                                          width:
+                                          MediaQuery.of(context).size.width,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PracticeScreen()));
+                                            },
+                                            child: Text('Topic2'),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                            //Navigator.push(context, MaterialPageRoute(builder: (context)=> PracticeScreen()));
                           },
                           icon: Image(
                             image: AssetImage('assets/chat.png'),
-                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
-                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            height: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
+                            width: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
                           ),
                         ),
                       ),
@@ -142,19 +215,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         child: IconButton(
-                          onPressed: ()async{
+                          onPressed: () async {
                             await soundOpener();
                           },
                           icon: Image(
                             image: AssetImage('assets/upload.png'),
-                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
-                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            height: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
+                            width: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
                           ),
                         ),
                       ),
@@ -177,11 +258,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) - 60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) - 160,
+                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
+                                60
+                            : ((MediaQuery.of(context).size.width - 40) / 3) -
+                                160,
                         child: IconButton(
                           onPressed: () {
                             Navigator.push(
@@ -193,8 +278,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           icon: Image(
                             image: AssetImage('assets/microphone.png'),
-                            height: MediaQuery.of(context).size.width < 500 ? 40 : 120,
-                            width: MediaQuery.of(context).size.width < 500 ? 40 : 120,
+                            height: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
+                            width: MediaQuery.of(context).size.width < 500
+                                ? 40
+                                : 120,
                           ),
                         ),
                       ),
@@ -227,14 +316,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 125,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(ColorConst.containerColor),
-                        padding: MaterialStateProperty.all(EdgeInsets.all(8)),
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
+                          backgroundColor: MaterialStateProperty.all(
+                              ColorConst.containerColor),
+                          padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
-                          )
-                        )
-                      ),
+                          ))),
                       onPressed: () {},
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -273,14 +360,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         "Text that is coming from the audio why didn't it work this computer is broken",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.robotoCondensed(color: ColorConst.primaryColor),
+                        style: GoogleFonts.robotoCondensed(
+                            color: ColorConst.primaryColor),
                       ),
                     ),
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Text("Created on December 24, 2024",style: GoogleFonts.robotoCondensed(color: ColorConst.primaryColor),),
+                      child: Text(
+                        "Created on December 24, 2024",
+                        style: GoogleFonts.robotoCondensed(
+                            color: ColorConst.primaryColor),
+                      ),
                     ),
                   ),
                 ],

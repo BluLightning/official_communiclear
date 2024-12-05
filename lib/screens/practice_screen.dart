@@ -112,7 +112,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
     return Scaffold(
       backgroundColor: ColorConst.backgroundColor,
       appBar: AppBar(
-        title: Text("Chat with AI", style: GoogleFonts.robotoCondensed(
+        title: Text("Practice Bot", style: GoogleFonts.robotoCondensed(
           color: ColorConst.backgroundColor,
           fontSize: 30,
         ),),
@@ -159,16 +159,26 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
+                    style: TextStyle(color: ColorConst.primaryColor),
+                    cursorColor: ColorConst.primaryColor,
                     decoration: InputDecoration(
                       hintText: "Type your message...",
+                      hintStyle: TextStyle(color: ColorConst.primaryColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: ColorConst.primaryColor,
+                          width: 1,
+                        )
+                      )
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: ColorConst.iconColor,),
                   onPressed: () {
                     final message = _controller.text.trim();
                     if (message.isNotEmpty) {
