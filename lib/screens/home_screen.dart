@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:official_communiclear/screens/practice_screen.dart';
 import '../constants/color_constants.dart';
-import 'recording_screen.dart'; // Import the RecordingScreen
+import 'recording_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'fileviewer_screen.dart';
 
@@ -19,16 +19,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> soundOpener() async {
-    // Get the app's private directory where recordings are saved
     Directory appDocDir = await getApplicationDocumentsDirectory();
-
-    // List all recorded audio files in the private directory
     List<FileSystemEntity> recordings = appDocDir
         .listSync()
         .where((file) => file.path.endsWith('.wav'))
         .toList();
 
-    // Log all available recordings
     if (recordings.isNotEmpty) {
       print("Recordings available in the app's directory:");
       for (var recording in recordings) {
@@ -38,22 +34,15 @@ class _HomeScreenState extends State<HomeScreen> {
       print("No recordings found in the app's directory.");
     }
 
-    // Allow the user to pick a file from public storage
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [
-        'mp3',
-        'mp4',
-        'wav',
-        'txt'
-      ], // Allow specific file types
+      allowedExtensions: ['mp3', 'mp4', 'wav', 'txt'],
     );
 
     if (result != null) {
       File pickedFile = File(result.files.single.path!);
       print("Picked file: ${pickedFile.path}");
 
-      // Navigate to the FileViewerScreen with the picked file path
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -65,9 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-// Example function to play audio
   void _playAudio(File audioFile) {
-    // Implement audio player logic here
     print("Playing audio file: ${audioFile.path}");
   }
 
@@ -111,14 +98,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         width: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         height: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         child: IconButton(
                           onPressed: () {
                             showModalBottomSheet(
@@ -126,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (context) {
                                 return Container(
                                   height:
-                                      MediaQuery.of(context).size.height / 2,
+                                  MediaQuery.of(context).size.height / 2,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
                                           topRight: Radius.circular(25),
@@ -148,16 +135,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         SizedBox(
                                           width:
-                                              MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.width,
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PracticeScreen()));
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PracticeScreen(
+                                                        topic: 'Job Interviews',
+                                                      ),
+                                                ),
+                                              );
                                             },
-                                            child: Text('Topic1'),
+                                            child: Text('Job Interviews'),
                                           ),
                                         ),
                                         SizedBox(
@@ -169,12 +160,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PracticeScreen()));
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PracticeScreen(
+                                                        topic: 'Casual Conversations',
+                                                      ),
+                                                ),
+                                              );
                                             },
-                                            child: Text('Topic2'),
+                                            child: Text('Casual Conversations'),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        SizedBox(
+                                          width:
+                                          MediaQuery.of(context).size.width,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PracticeScreen(
+                                                        topic: 'Public Speaking',
+                                                      ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text('Public Speaking'),
                                           ),
                                         )
                                       ],
@@ -183,7 +199,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               },
                             );
-                            //Navigator.push(context, MaterialPageRoute(builder: (context)=> PracticeScreen()));
                           },
                           icon: Image(
                             image: AssetImage('assets/chat.png'),
@@ -216,14 +231,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         width: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         height: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         child: IconButton(
                           onPressed: () async {
                             await soundOpener();
@@ -259,14 +274,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         width: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         height: MediaQuery.of(context).size.width < 500
                             ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                                60
+                            60
                             : ((MediaQuery.of(context).size.width - 40) / 3) -
-                                160,
+                            160,
                         child: IconButton(
                           onPressed: () {
                             Navigator.push(
@@ -319,9 +334,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundColor: MaterialStateProperty.all(
                               ColorConst.containerColor),
                           padding: MaterialStateProperty.all(EdgeInsets.all(8)),
-                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ))),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                          )),
                       onPressed: () {},
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
