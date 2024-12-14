@@ -137,27 +137,41 @@ class _PracticeScreenState extends State<PracticeScreen> {
 
   Future<void> _saveConversation() async {
     try {
+      // Convert messages to a single string
       String conversation = _messages.map((msg) {
         final sender = msg['sender'] == 'user' ? 'You' : 'AI';
         return "$sender: ${msg['message']}";
       }).join("\n");
 
-      final directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/conversation_${DateTime.now().millisecondsSinceEpoch}.txt';
+      // Use the Download directory for saving the file
+      final directory = Directory('/storage/emulated/0/Download'); // Path to the public Download folder
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
 
+      // Define the file path
+      final filePath =
+          '${directory.path}/conversation_${DateTime.now().millisecondsSinceEpoch}.txt';
+
+      // Save the conversation to the file
       final file = File(filePath);
       await file.writeAsString(conversation);
 
+      // Notify the user of success
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Conversation saved to $filePath')),
       );
+
+      print('Conversation saved: $filePath');
     } catch (e) {
+      // Handle errors
       print('Error saving conversation: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save conversation')),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
