@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         SizedBox(
                                           width:
-                                          MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.width - 40,
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         SizedBox(
                                           width:
-                                          MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.width - 40,
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         SizedBox(
                                           width:
-                                          MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.width - 40,
                                           child: ElevatedButton(
                                             onPressed: () {
                                               Navigator.push(
