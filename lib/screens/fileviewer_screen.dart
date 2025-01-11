@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
 
 import '../constants/color_constants.dart';
 
@@ -223,32 +225,82 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
     try {
       final bytes = await File(widget.filePath).readAsBytes();
 
-      final response = await http.post(
+      final request = http.MultipartRequest(
+        'POST',
         Uri.parse('https://api.openai.com/v1/audio/transcriptions'),
-        headers: {
-          'Authorization': 'Bearer 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',
-          // Replace with your OpenAI API key
-        },
-        body: bytes,
       );
+
+      request.headers['Authorization'] = 'Bearer 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';
+      request.fields['model'] = 'whisper-1'; // Add model parameter
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: 'audio.wav',
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        final transcription = data['text'] ?? "No transcription available.";
+
+        // Save transcription in the same directory as the original file
+        final savedPath = await _saveTranscriptionToSameDirectory(transcription, widget.filePath);
+
         setState(() {
-          fileContent = data['text'] ?? "No transcription available.";
+          fileContent = transcription;
         });
+
+        // Show success prompt with file path
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Transcription saved at $savedPath")),
+        );
 
         // Analyze the transcribed text
         await _analyzeText();
       } else {
-        print("Error transcribing audio: ${response.body}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to transcribe audio: ${response.body}")),
+        );
       }
     } catch (e) {
       print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error transcribing audio.")),
+      );
     }
 
     setState(() => isProcessing = false);
   }
+
+
+  Future<String> _saveTranscriptionToSameDirectory(String transcription, String originalFilePath) async {
+    try {
+      // Retrieve the Downloads directory explicitly
+      final downloadsDir = Directory('/storage/emulated/0/Download');
+
+      // Ensure the directory exists
+      if (!downloadsDir.existsSync()) {
+        throw Exception("Downloads directory does not exist.");
+      }
+
+      // Create a unique filename for the transcription
+      final transcriptionFilePath = '${downloadsDir.path}/transcription_${DateTime.now().millisecondsSinceEpoch}.txt';
+
+      // Save the transcription
+      final transcriptionFile = File(transcriptionFilePath);
+      await transcriptionFile.writeAsString(transcription);
+
+      return transcriptionFilePath;
+    } catch (e) {
+      print("Error saving transcription: $e");
+      throw Exception("Failed to save transcription to Downloads folder.");
+    }
+  }
+
 
   @override
   void dispose() {
