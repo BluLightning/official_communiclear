@@ -200,12 +200,15 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
   Future<void> _deleteFile() async {
     try {
       final file = File(widget.filePath);
-      if (await file.exists()) {
-        await file.delete();
+      print("Attempting to delete: ${file.path}"); // Log file path
+
+      if (file.existsSync()) {
+        file.deleteSync(); // Use deleteSync for immediate deletion
+        print("File successfully deleted: ${file.path}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("File deleted successfully.")),
         );
-        Navigator.pop(context); // Return to the previous screen
+        Navigator.pop(context, true); // Notify parent to refresh
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("File does not exist.")),
@@ -214,10 +217,12 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
     } catch (e) {
       print("Error deleting file: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error deleting file.")),
+        SnackBar(content: Text("Error deleting file: ${e.toString()}")),
       );
     }
   }
+
+
 
   Future<void> _transcribeAudio() async {
     setState(() => isProcessing = true);

@@ -3,7 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'fileviewer_screen.dart'; // Ensure this is imported
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({super.key});
@@ -67,19 +68,15 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
   }
 
   Future<void> _prepareNewRecordingPath() async {
-    // Use the Downloads directory to save recordings
     Directory downloadsDir = Directory('/storage/emulated/0/Download');
 
-    // Ensure the directory exists
     if (!downloadsDir.existsSync()) {
       downloadsDir.createSync(recursive: true);
     }
 
-    // Define the file path for the recording
     _filePath = '${downloadsDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.wav';
     print("Recording path set to: $_filePath");
   }
-
 
   Future<void> _startRecording() async {
     if (_recorder != null && !_isRecording) {
@@ -90,7 +87,6 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
         codec: Codec.pcm16WAV,
       );
 
-      // Start listening to the dB level if available
       _dbLevelStream = _recorder!.onProgress!.map((event) {
         print("Decibel level: ${event.decibels}"); // Debugging log
         return event.decibels ?? 0.0;
@@ -103,7 +99,6 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
       await _recorder!.stopRecorder();
       setState(() => _isRecording = false);
 
-      // Refresh the recording history
       _loadRecordings();
       await _prepareNewRecordingPath();
     }
@@ -135,65 +130,26 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
   Future<void> _loadRecordings() async {
     Directory downloadsDir = Directory('/storage/emulated/0/Download');
 
-    // List all .wav files in the Downloads directory
-    setState(() {
-      _recordings = downloadsDir.listSync().where((file) => file.path.endsWith('.wav')).toList();
-    });
-
-    print("Recordings loaded: ${_recordings.map((e) => e.path).toList()}");
-  }
-
-
-  Future<void> _renameRecording(FileSystemEntity recording) async {
-    String oldPath = recording.path;
-    String newName = await _showRenameDialog(recording.path.split('/').last);
-    if (newName.isNotEmpty) {
-      Directory dir = recording.parent;
-      String newPath = '${dir.path}/$newName.wav';
-      await recording.rename(newPath);
-      _loadRecordings();
+    if (downloadsDir.existsSync()) {
+      setState(() {
+        _recordings = downloadsDir
+            .listSync()
+            .where((file) => file.path.endsWith('.wav'))
+            .toList();
+      });
+      print("Audio recordings loaded: ${_recordings.map((e) => e.path).toList()}");
+    } else {
+      print("Downloads directory does not exist.");
+      setState(() {
+        _recordings = [];
+      });
     }
-  }
-
-  Future<String> _showRenameDialog(String currentName) async {
-    TextEditingController controller = TextEditingController(text: currentName.replaceAll('.wav', ''));
-    String newName = '';
-
-    await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Rename Recording"),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(labelText: "New name"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                newName = controller.text;
-                Navigator.of(context).pop();
-              },
-              child: Text("Save"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancel"),
-            ),
-          ],
-        );
-      },
-    );
-    return newName;
   }
 
   Widget _buildAudioVisualizer() {
     return StreamBuilder<double>(
       stream: _dbLevelStream,
       builder: (context, snapshot) {
-        // If dB level is not provided, fall back to oscillating animation
         if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
           return ScaleTransition(
             scale: _animationController!,
@@ -201,9 +157,8 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
           );
         }
 
-        // Use actual dB level if available
         double dbLevel = snapshot.data!;
-        double normalizedLevel = max(0.1, (dbLevel + 60) / 60); // Normalize to a range of 0.1 to 1.0
+        double normalizedLevel = max(0.1, (dbLevel + 60) / 60);
 
         return Container(
           width: 10,
@@ -226,7 +181,8 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Record Conversation'),
+        title: Text('Record Conversation', style: TextStyle(fontSize: 24, color: Colors.white)),
+        backgroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -234,20 +190,20 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
           children: [
             Text(
               _isRecording ? "Recording in progress..." : "Press to start recording",
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
             IconButton(
               icon: Icon(_isRecording ? Icons.stop : Icons.mic),
               iconSize: 80,
-              color: Colors.blue,
+              color: Colors.red,
               onPressed: _isRecording ? _stopRecording : _startRecording,
             ),
             if (_isRecording) ...[
               SizedBox(height: 20),
               _buildAudioVisualizer(),
             ],
-            Divider(height: 40),
+            Divider(height: 40, color: Colors.white),
             Expanded(
               child: ListView.builder(
                 itemCount: _recordings.length,
@@ -256,21 +212,21 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
                   String fileName = recording.path.split('/').last;
 
                   return ListTile(
-                    title: GestureDetector(
-                      onTap: () => _renameRecording(recording),
-                      child: Text(fileName),
+                    title: Text(
+                      fileName,
+                      style: TextStyle(fontSize: 18, color: Colors.lightBlueAccent),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.play_arrow),
+                          icon: Icon(Icons.play_arrow, color: Colors.green),
                           onPressed: () => _startPlayback(recording.path),
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            recording.deleteSync();
+                            File(recording.path).deleteSync();
                             _loadRecordings();
                           },
                         ),
@@ -283,6 +239,7 @@ class _RecordingScreenState extends State<RecordingScreen> with SingleTickerProv
           ],
         ),
       ),
+      backgroundColor: Colors.black,
     );
   }
 }
