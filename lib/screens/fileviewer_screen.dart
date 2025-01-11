@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+
+import '../constants/color_constants.dart';
 
 class FileViewerScreen extends StatefulWidget {
   final String filePath;
@@ -309,9 +312,14 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConst.backgroundColor,
       appBar: AppBar(
-        title: Text("File Viewer"),
-        backgroundColor: Colors.blue,
+        title: Text("File Viewer", style: GoogleFonts.robotoCondensed(
+        color: ColorConst.iconColor,
+        fontSize: 30)),
+        backgroundColor: ColorConst.backgroundColor,
+        iconTheme: IconThemeData(
+          color: ColorConst.iconColor,),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
@@ -346,44 +354,60 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isTextFile
-            ? Column(
-          children: [
-            Expanded(
-              child: highlights.isEmpty
-                  ? Center(child: Text(fileContent ?? "No content available."))
-                  : _buildChatBubbles(),
-            ),
-            if (isProcessing) CircularProgressIndicator(),
-            if (!isProcessing)
-              ElevatedButton(
-                onPressed: _analyzeText,
-                child: Text("Analyze Text"),
+            ? SizedBox(
+          width: MediaQuery.of(context).size.width,
+              child: Column(
+                        children: [
+              Expanded(
+                child: highlights.isEmpty
+                    ? Center(child: Text(fileContent ?? "No content available."))
+                    : _buildChatBubbles(),
               ),
-          ],
-        )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Playing: ${widget.filePath
-                  .split('/')
-                  .last}",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: isPlaying ? _stopAudio : _playAudio,
-              child: Text(isPlaying ? "Stop Audio" : "Play Audio"),
-            ),
-            SizedBox(height: 20),
-            if (isProcessing) CircularProgressIndicator(),
-            if (!isProcessing)
-              ElevatedButton(
-                onPressed: _transcribeAudio,
-                child: Text("Transcribe and Analyze Audio"),
+              if (isProcessing) CircularProgressIndicator(),
+              if (!isProcessing)
+                ElevatedButton(
+                  onPressed: _analyzeText,
+                  child: Text("Analyze Text"),
+                ),
+                        ],
+                      ),
+            )
+            : SizedBox(
+          width: MediaQuery.of(context).size.width,
+              child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+              Text(
+                "Playing: ${widget.filePath
+                    .split('/')
+                    .last}",
+                style: GoogleFonts.robotoCondensed(fontSize: 18, fontWeight: FontWeight.bold, color: ColorConst.primaryColor),
               ),
-          ],
-        ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(ColorConst.primaryColor),
+                ),
+                onPressed: isPlaying ? _stopAudio : _playAudio,
+                child: Text(isPlaying ? "Stop Audio" : "Play Audio", style: GoogleFonts.robotoCondensed(
+                  color: ColorConst.secondaryColor
+                )),
+              ),
+              SizedBox(height: 20),
+              if (isProcessing) CircularProgressIndicator(),
+              if (!isProcessing)
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(ColorConst.primaryColor),
+                  ),
+                  onPressed: _transcribeAudio,
+                  child: Text("Transcribe and Analyze Audio", style: GoogleFonts.robotoCondensed(
+                      color: ColorConst.secondaryColor
+                  )),
+                ),
+                        ],
+                      ),
+            ),
       ),
     );
   }

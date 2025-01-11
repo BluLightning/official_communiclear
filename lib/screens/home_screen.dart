@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           "Home",
           style: GoogleFonts.robotoCondensed(
-            color: Colors.blue,
+            color: ColorConst.iconColor,
             fontSize: 30,
           ),
         ),
