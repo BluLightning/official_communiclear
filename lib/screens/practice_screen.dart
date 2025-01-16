@@ -171,7 +171,56 @@ class _PracticeScreenState extends State<PracticeScreen> {
       );
     }
   }
+  Future<List<Map<String, String>>> analyzeSentenceWithContext(
+      String newMessage,
+      List<Map<String, String>> conversationContext) async {
+    final url = Uri.parse('https://api.openai.com/v1/chat/completions');
 
+    // Build the message list for the API call, including context
+    final List<Map<String, String>> apiMessages = [
+      {
+        "role": "system",
+        "content": "You are a language analysis tool. Break down the most recent user message into individual words or phrases and provide feedback in the following JSON format:\n\n{\n  {\"word\": \"<word>\", \"color\": \"<color>\", \"explanation\": \"<reason for the color>\"},\n  ...\n}\n\nUse the colors 'green' (correct), 'yellow' (partially correct or unclear), and 'red' (incorrect or problematic). Ensure the output is structured as valid JSON for processing. Consider the conversation context provided for better accuracy."
+      },
+      // Include the conversation context
+      ...conversationContext.map((msg) => {
+        "role": msg['sender'] == "user" ? "user" : "assistant",
+        "content": msg['message']!
+      }),
+      // Add the new message for analysis
+      {"role": "user", "content": newMessage},
+    ];
+
+    // Send the API request
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $_apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        "model": "gpt-3.5-turbo",
+        "messages": apiMessages,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final aiResponse = data['choices'][0]['message']['content'];
+
+      try {
+        // Parse the structured JSON response
+        print(aiResponse);
+        return List<Map<String, String>>.from(json.decode(aiResponse));
+      } catch (e) {
+        print("Error parsing AI response: $e");
+        return [];
+      }
+    } else {
+      print("Error: ${response.statusCode}");
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
