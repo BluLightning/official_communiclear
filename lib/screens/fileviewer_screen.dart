@@ -91,7 +91,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
-          'Authorization': 'Bearer YOUR_API_KEY',
+          'Authorization': 'Bearer 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',
           'Content-Type': 'application/json',
         },
         body: json.encode({
@@ -150,45 +150,6 @@ Highlight text errors and categorize them. Return JSON in the format:
 
     setState(() => isProcessing = false);
   }
-
-  Future<String> _fetchDetailedFeedback(String text) async {
-    try {
-      final response = await http.post(
-        Uri.parse('https://api.openai.com/v1/chat/completions'),
-        headers: {
-          'Authorization': 'Bearer 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',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          "model": "gpt-3.5-turbo",
-          "messages": [
-            {
-              "role": "system",
-              "content": """
-You are an advanced writing assistant. Provide a detailed and constructive feedback for the following text. Include specific suggestions on grammar, clarity, style, and overall improvements.
-"""
-            },
-            {
-              "role": "user",
-              "content": text,
-            },
-          ],
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['choices'][0]['message']['content'] ?? "No feedback available.";
-      } else {
-        print("Error fetching detailed feedback: ${response.body}");
-        return "Failed to fetch feedback. Please try again later.";
-      }
-    } catch (e) {
-      print("Error: $e");
-      return "An error occurred while fetching feedback.";
-    }
-  }
-
 
 
 
@@ -266,6 +227,45 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
       );
     }
   }
+
+  Future<String> _fetchDetailedFeedback(String text) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Authorization': 'Bearer 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',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "system",
+              "content": """
+You are an advanced writing assistant. Provide a detailed and constructive feedback for the following text. Include specific suggestions on grammar, clarity, style, and overall improvements.
+"""
+            },
+            {
+              "role": "user",
+              "content": text,
+            },
+          ],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['choices'][0]['message']['content'] ?? "No feedback available.";
+      } else {
+        print("Error fetching detailed feedback: ${response.body}");
+        return "Failed to fetch feedback. Please try again later.";
+      }
+    } catch (e) {
+      print("Error: $e");
+      return "An error occurred while fetching feedback.";
+    }
+  }
+
 
 
 
@@ -444,8 +444,8 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
       backgroundColor: ColorConst.backgroundColor,
       appBar: AppBar(
         title: Text("File Viewer", style: GoogleFonts.robotoCondensed(
-        color: ColorConst.iconColor,
-        fontSize: 30)),
+            color: ColorConst.iconColor,
+            fontSize: 30)),
         backgroundColor: ColorConst.backgroundColor,
         iconTheme: IconThemeData(
           color: ColorConst.iconColor,),
@@ -485,8 +485,8 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
         child: isTextFile
             ? SizedBox(
           width: MediaQuery.of(context).size.width,
-              child: Column(
-                        children: [
+          child: Column(
+            children: [
               Expanded(
                 child: highlights.isEmpty
                     ? Center(child: Text(fileContent ?? "No content available."))
@@ -498,14 +498,14 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
                   onPressed: _analyzeText,
                   child: Text("Analyze Text"),
                 ),
-                        ],
-                      ),
-            )
+            ],
+          ),
+        )
             : SizedBox(
           width: MediaQuery.of(context).size.width,
-              child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               Text(
                 "Playing: ${widget.filePath
                     .split('/')
@@ -519,7 +519,7 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
                 ),
                 onPressed: isPlaying ? _stopAudio : _playAudio,
                 child: Text(isPlaying ? "Stop Audio" : "Play Audio", style: GoogleFonts.robotoCondensed(
-                  color: ColorConst.secondaryColor
+                    color: ColorConst.secondaryColor
                 )),
               ),
               SizedBox(height: 20),
@@ -534,9 +534,9 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
                       color: ColorConst.secondaryColor
                   )),
                 ),
-                        ],
-                      ),
-            ),
+            ],
+          ),
+        ),
       ),
     );
   }
