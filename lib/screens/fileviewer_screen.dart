@@ -83,14 +83,15 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
   }
 
   Future<void> _analyzeText() async {
+    if (fileContent == null || fileContent!.isEmpty) return;
+
     setState(() => isProcessing = true);
 
     try {
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
-          'Authorization': 'Bearer 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',
-          // Replace with your OpenAI API key
+          'Authorization': 'Bearer YOUR_API_KEY',
           'Content-Type': 'application/json',
         },
         body: json.encode({
@@ -99,13 +100,12 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
             {
               "role": "system",
               "content": """
-Provide feedback for the following text. Highlight areas needing improvement as JSON objects in this format:
+Highlight text errors and categorize them. Return JSON in the format:
 [
-    {"text": "example text", "color": "red"},
-    {"text": "another text", "color": "blue"}
+    {"text": "example text", "color": "red", "feedback": "Grammar issue. Consider revising."},
+    {"text": "another text", "color": "yellow", "feedback": "Filler word."}
 ]
-Only respond with valid JSON. Do not include anything outside the JSON array.
-            """
+"""
             },
             {
               "role": "user",
@@ -119,10 +119,8 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
         final data = json.decode(response.body);
         final rawFeedback = data['choices'][0]['message']['content'] ?? "";
 
-        // Preprocess response to extract JSON
-        String jsonFeedback = _extractJson(rawFeedback);
+        final jsonFeedback = _extractJson(rawFeedback);
 
-        // Parse the JSON feedback
         try {
           final parsedHighlights = json.decode(jsonFeedback) as List<dynamic>;
           setState(() {
@@ -130,27 +128,69 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
               return {
                 "text": item["text"],
                 "color": _mapColor(item["color"]),
-                "feedback": item["analysis"], // Add feedback here
+                "feedback": item["feedback"],
               };
             }).toList();
           });
+          print("Parsed Highlights: $highlights"); // Debug output
         } catch (e) {
           print("Error parsing JSON feedback: $e");
           setState(() {
-            highlights = []; // Clear highlights on error
+            highlights = [];
           });
         }
       } else {
         print("Error analyzing text: ${response.body}");
-        setState(() => highlights = []); // Clear highlights on error
+        setState(() => highlights = []);
       }
     } catch (e) {
       print("Error: $e");
-      setState(() => highlights = []); // Clear highlights on error
+      setState(() => highlights = []);
     }
 
     setState(() => isProcessing = false);
   }
+
+  Future<String> _fetchDetailedFeedback(String text) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Authorization': 'Bearer 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',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "system",
+              "content": """
+You are an advanced writing assistant. Provide a detailed and constructive feedback for the following text. Include specific suggestions on grammar, clarity, style, and overall improvements.
+"""
+            },
+            {
+              "role": "user",
+              "content": text,
+            },
+          ],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['choices'][0]['message']['content'] ?? "No feedback available.";
+      } else {
+        print("Error fetching detailed feedback: ${response.body}");
+        return "Failed to fetch feedback. Please try again later.";
+      }
+    } catch (e) {
+      print("Error: $e");
+      return "An error occurred while fetching feedback.";
+    }
+  }
+
+
+
 
   String _extractJson(String rawFeedback) {
     final jsonStart = rawFeedback.indexOf('[');
@@ -203,13 +243,18 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
       print("Attempting to delete: ${file.path}"); // Log file path
 
       if (file.existsSync()) {
-        file.deleteSync(); // Use deleteSync for immediate deletion
+        // Use deleteSync for immediate and reliable deletion
+        file.deleteSync();
         print("File successfully deleted: ${file.path}");
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("File deleted successfully.")),
         );
-        Navigator.pop(context, true); // Notify parent to refresh
+
+        // Notify parent to refresh the list and close the screen
+        Navigator.pop(context, true);
       } else {
+        print("File does not exist: ${file.path}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("File does not exist.")),
         );
@@ -221,6 +266,7 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
       );
     }
   }
+
 
 
 
@@ -325,44 +371,70 @@ Only respond with valid JSON. Do not include anything outside the JSON array.
       itemCount: highlights.length,
       itemBuilder: (context, index) {
         final highlight = highlights[index];
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Chat bubble for original text
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Text(
-                highlight["text"],
-                style: TextStyle(
-                  fontSize: 16,
-                  color: highlight["color"], // Highlight the text color
+        return GestureDetector(
+          onTap: () async {
+            print("Tapped Highlight: ${highlight}"); // Debug log
+
+            // Fetch detailed feedback
+            final detailedFeedback = await _fetchDetailedFeedback(highlight["text"]);
+
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Detailed Feedback"),
+                  content: SingleChildScrollView(
+                    child: Text(
+                      detailedFeedback,
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("Close"),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-              ),
-            ),
-            // Feedback in small grey text below the chat bubble
-            if (highlight["feedback"] != null && highlight["feedback"]!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  highlight["feedback"],
+                  highlight["text"],
                   style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                    color: highlight["color"],
                   ),
                 ),
               ),
-          ],
+              if (highlight["feedback"] != null && highlight["feedback"]!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    highlight["feedback"],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         );
       },
     );
   }
-
 
 
 
