@@ -201,19 +201,17 @@ Highlight text errors and categorize them. Return JSON in the format:
   Future<void> _deleteFile() async {
     try {
       final file = File(widget.filePath);
-      print("Attempting to delete: ${file.path}"); // Log file path
+      print("Attempting to delete: ${file.path}");
 
       if (file.existsSync()) {
-        // Use deleteSync for immediate and reliable deletion
-        file.deleteSync();
+        await file.delete(); // Ensure async deletion
         print("File successfully deleted: ${file.path}");
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("File deleted successfully.")),
         );
 
-        // Notify parent to refresh the list and close the screen
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // Notify parent screen about deletion
       } else {
         print("File does not exist: ${file.path}");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -227,6 +225,7 @@ Highlight text errors and categorize them. Return JSON in the format:
       );
     }
   }
+
 
   Future<String> _fetchDetailedFeedback(String text) async {
     try {
@@ -453,7 +452,7 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
           IconButton(
             icon: Icon(Icons.delete),
             onPressed: () async {
-              bool? confirmDelete = await showDialog<bool>(
+              final confirmDelete = await showDialog<bool>(
                 context: context,
                 builder: (context) {
                   return AlertDialog(
@@ -474,7 +473,7 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
               );
 
               if (confirmDelete == true) {
-                _deleteFile();
+                await _deleteFile();
               }
             },
           ),

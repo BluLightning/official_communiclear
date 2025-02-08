@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,21 +18,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> soundOpener() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    List<FileSystemEntity> recordings = appDocDir
-        .listSync()
-        .where((file) => file.path.endsWith('.wav'))
-        .toList();
-
-    if (recordings.isNotEmpty) {
-      print("Recordings available in the app's directory:");
-      for (var recording in recordings) {
-        print("Recording: ${recording.path}");
-      }
-    } else {
-      print("No recordings found in the app's directory.");
-    }
-
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['mp3', 'mp4', 'wav', 'txt'],
@@ -43,19 +27,27 @@ class _HomeScreenState extends State<HomeScreen> {
       File pickedFile = File(result.files.single.path!);
       print("Picked file: ${pickedFile.path}");
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FileViewerScreen(filePath: pickedFile.path),
-        ),
-      );
+      if (pickedFile.existsSync()) {
+        final isDeleted = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FileViewerScreen(filePath: pickedFile.path),
+          ),
+        );
+
+        // Refresh UI after a file is deleted
+        if (isDeleted == true) {
+          setState(() {});
+        }
+      } else {
+        print("File does not exist anymore.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("File not found. It may have been deleted.")),
+        );
+      }
     } else {
       print("User canceled the picker.");
     }
-  }
-
-  void _playAudio(File audioFile) {
-    print("Playing audio file: ${audioFile.path}");
   }
 
   @override
@@ -73,329 +65,124 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         centerTitle: true,
       ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: ColorConst.containerColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              width: MediaQuery.of(context).size.width - 40,
-              height: MediaQuery.of(context).size.width < 500 ? 120 : 350,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        child: IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                  height:
-                                  MediaQuery.of(context).size.height / 2,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(25),
-                                          topLeft: Radius.circular(25)),
-                                      color: ColorConst.backgroundColor),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Text(
-                                          "Choose Conversation Topic",
-                                          style: TextStyle(
-                                              color: ColorConst.primaryColor),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        SizedBox(
-                                          width:
-                                          MediaQuery.of(context).size.width - 40,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PracticeScreen(
-                                                        topic: 'Job Interviews',
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                            child: Text('Job Interviews'),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        SizedBox(
-                                          width:
-                                          MediaQuery.of(context).size.width - 40,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PracticeScreen(
-                                                        topic: 'Casual Conversations',
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                            child: Text('Casual Conversations'),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        SizedBox(
-                                          width:
-                                          MediaQuery.of(context).size.width - 40,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      PracticeScreen(
-                                                        topic: 'Public Speaking',
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                            child: Text('Public Speaking'),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          icon: Image(
-                            image: AssetImage('assets/chat.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Practice",
-                        style: GoogleFonts.robotoCondensed(
-                          color: ColorConst.primaryColor,
-                          fontSize: 18,
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        child: IconButton(
-                          onPressed: () async {
-                            await soundOpener();
-                          },
-                          icon: Image(
-                            image: AssetImage('assets/upload.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Upload",
-                        style: GoogleFonts.robotoCondensed(
-                          color: ColorConst.primaryColor,
-                          fontSize: 18,
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        width: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        height: MediaQuery.of(context).size.width < 500
-                            ? ((MediaQuery.of(context).size.width - 40) / 3) -
-                            60
-                            : ((MediaQuery.of(context).size.width - 40) / 3) -
-                            160,
-                        child: IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RecordingScreen(),
-                              ),
-                            );
-                          },
-                          icon: Image(
-                            image: AssetImage('assets/microphone.png'),
-                            height: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                            width: MediaQuery.of(context).size.width < 500
-                                ? 40
-                                : 120,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Record",
-                        style: GoogleFonts.robotoCondensed(
-                          color: ColorConst.primaryColor,
-                          fontSize: 18,
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(height: 20),
+
+          Center(
+            child: Image.asset(
+              'assets/Logo.jpg', // Add your app logo here
+              height: 150,
             ),
-            SizedBox(height: 20),
-            Divider(color: Colors.grey.shade800),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Recent",
-                    style: GoogleFonts.robotoCondensed(
-                        color: ColorConst.primaryColor, fontSize: 20),
-                  ),
-                  SizedBox(
-                    width: 125,
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              ColorConst.containerColor),
-                          padding: MaterialStateProperty.all(EdgeInsets.all(8)),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                          )),
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "History",
-                            style: GoogleFonts.robotoCondensed(
-                                color: ColorConst.primaryColor, fontSize: 20),
-                          ),
-                          Icon(
-                            CupertinoIcons.arrow_right_circle,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
+          ),
+
+          // Three Primary Buttons (Now Moved to the Bottom)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildButton("Practice", "assets/chat.png", () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return _buildPracticeModal();
+                    },
+                  );
+                }),
+                _buildButton("Upload", "assets/upload.png", soundOpener),
+                _buildButton("Record", "assets/microphone.png", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RecordingScreen(),
                     ),
-                  )
-                ],
-              ),
+                  );
+                }),
+              ],
             ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: ColorConst.containerColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              width: MediaQuery.of(context).size.width - 40,
-              height: MediaQuery.of(context).size.width < 500 ? 120 : 350,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        "Text that is coming from the audio why didn't it work this computer is broken",
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.robotoCondensed(
-                            color: ColorConst.primaryColor),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        "Created on December 24, 2024",
-                        style: GoogleFonts.robotoCondensed(
-                            color: ColorConst.primaryColor),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to build the Practice, Upload, and Record Buttons
+  Widget _buildButton(String title, String assetPath, VoidCallback onTap) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          width: 80,
+          height: 80,
+          child: IconButton(
+            onPressed: onTap,
+            icon: Image.asset(
+              assetPath,
+              height: 40,
+              width: 40,
             ),
-          ],
+          ),
+        ),
+        SizedBox(height: 5),
+        Text(
+          title,
+          style: GoogleFonts.robotoCondensed(
+            color: ColorConst.primaryColor,
+            fontSize: 18,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Function to build Practice Modal
+  Widget _buildPracticeModal() {
+    return Container(
+      height: MediaQuery.of(context).size.height / 2,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(25),
+          topLeft: Radius.circular(25),
+        ),
+        color: ColorConst.backgroundColor,
+      ),
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          Text(
+            "Choose Conversation Topic",
+            style: TextStyle(color: ColorConst.primaryColor),
+          ),
+          SizedBox(height: 20),
+          _buildPracticeOption('Job Interviews'),
+          _buildPracticeOption('Casual Conversations'),
+          _buildPracticeOption('Public Speaking'),
+        ],
+      ),
+    );
+  }
+
+  // Function to build Practice Options
+  Widget _buildPracticeOption(String topic) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 40,
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PracticeScreen(topic: topic),
+              ),
+            );
+          },
+          child: Text(topic),
         ),
       ),
     );
