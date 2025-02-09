@@ -21,7 +21,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  final String _apiKey = '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';
+  final String _apiKey = 'API KEY INVALID';
 
   @override
   void initState() {
