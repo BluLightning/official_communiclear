@@ -5,6 +5,8 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 
 import '../constants/color_constants.dart';
@@ -91,7 +93,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
-          'Authorization': 'Bearer API KEY INVALID',
+          'Authorization': 'Bearer ${dotenv.env['OPENAI_API_KEY']}',
           'Content-Type': 'application/json',
         },
         body: json.encode({
@@ -232,7 +234,7 @@ Highlight text errors and categorize them. Return JSON in the format:
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
-          'Authorization': 'INVALID API KEY',
+          'Authorization': 'Bearer ${dotenv.env['OPENAI_API_KEY']}',
           'Content-Type': 'application/json',
         },
         body: json.encode({
@@ -280,7 +282,7 @@ You are an advanced writing assistant. Provide a detailed and constructive feedb
         Uri.parse('https://api.openai.com/v1/audio/transcriptions'),
       );
 
-      request.headers['Authorization'] = 'Bearer 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';
+      request.headers['Authorization'] = 'Bearer ${dotenv.env['OPENAI_API_KEY']}';
       request.fields['model'] = 'whisper-1'; // Add model parameter
       request.files.add(
         http.MultipartFile.fromBytes(

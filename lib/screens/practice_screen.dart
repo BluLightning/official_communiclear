@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:official_communiclear/constants/color_constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class PracticeScreen extends StatefulWidget {
   final String topic;
@@ -21,7 +23,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  final String _apiKey = 'API KEY INVALID';
+  final String _apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
 
   @override
   void initState() {
